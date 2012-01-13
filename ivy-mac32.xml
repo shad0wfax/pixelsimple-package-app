@@ -24,7 +24,7 @@
 	</publications>
 	<dependencies>
 		<dependency org="org.ffmpeg" name="32-bit-ffmpeg" rev="0.8" force="true" conf="bin->runtime(*),master(*)"/>
-		<dependency org="org.ffmpeg" name="32-bit-ffprobe" rev="0.8" force="true" conf="bin->runtime(*),master(*)"/>
+		<dependency org="org.ffmpeg" name="32-bit-ffprobe" rev="0.7_beta2" force="true" conf="bin->runtime(*),master(*)"/>
 
 		<dependency org="pixelsimple" name="commons-util" rev="latest.integration" force="true" conf="default"/>
 		<dependency org="pixelsimple" name="commons-command-runner" rev="latest.integration" force="true" conf="default"/>
