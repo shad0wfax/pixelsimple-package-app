@@ -242,6 +242,7 @@
   	<delete >
   		<fileset dir="${package.bin.dir}" includes="**/*.zip"/>
   	</delete>
+  	<chmod dir="${package.bin.dir}" perm="777" includes="**/*"/>
   	
 	<antcall target="zip-it-all"/>
   	
