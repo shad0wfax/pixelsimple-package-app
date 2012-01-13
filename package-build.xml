@@ -289,13 +289,13 @@
 		 <equals arg1="${os.type}" arg2="windows32" />
 		 <then>
 		   <echo message="retreive dependencies with ivy for Windows" />
-		   <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" sync="true" file="ivy-windows.xml" />
+		   <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" sync="true" file="ivy-windows32.xml" />
 		 </then>
 		<elseif>
 		 <equals arg1="${os.type}" arg2="mac32" />
 		 <then>
 		   <echo message="retreive dependencies with ivy for Mac" />
-		   <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" sync="true" file="ivy-mac.xml" />
+		   <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" sync="true" file="ivy-mac32.xml" />
 		 </then>
 		</elseif>
 		</if>
