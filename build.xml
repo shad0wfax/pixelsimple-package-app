@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== -->
+<!-- Ant build file (http://ant.apache.org/) for Ant 1.6.2 or above.        -->
+<!-- ====================================================================== -->
+
+<project name="package-app" default="publish-with-ivy" basedir="."  xmlns:ivy="antlib:org.apache.ivy.ant">
+	
+  <!-- ====================================================================== -->
+  <!-- This is parameter that needs to be passed to indicate the OS on which the build is being --> 
+  <!-- built on. The idea is that this parameter can be used in the ant build process to do different -->
+  <!-- things based on the OS. For example the package-app can load different ivy dependencies based on -->
+  <!-- the value of the OS. The values that can be passed for os.type are: -->	
+  <!-- windows32 -->	
+  <!-- mac32 -->
+  <!-- linux32 -->	
+  <!-- windows64 -->	
+  <!-- mac64 -->
+  <!-- linux64 -->	
+  <!-- ====================================================================== -->
+  <property name="os.type" value="windows32" />
+	
+	
+  <!-- ====================================================================== -->
+  <!-- The path to commons-build dir to pick resource from. Done so that it can be --> 
+  <!-- changed at the CI level as needed. The path to commonsBuild can be elsewhere on CI. -->
+  <!-- ====================================================================== -->
+  <property name="project.commonsBuildDir" value="../commons-build" />
+
+  <!-- ====================================================================== -->
+  <!-- Import maven-build.xml into the current project                        -->
+  <!-- ====================================================================== -->
+
+  <import file="package-build.xml"/>
+  
+  <!-- ====================================================================== -->
+  <!-- Help target                                                            -->
+  <!-- ====================================================================== -->
+
+  <target name="help">
+    <echo message="Please run: $ant -projecthelp"/>
+  </target>
+
+</project>

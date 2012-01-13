@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== -->
+<!-- Ant build file (http://ant.apache.org/) for Ant 1.6.2 or above.        -->
+<!-- ====================================================================== -->
+
+<project name="abstract-ant-jar-build" default="publish-with-ivy" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+  <echo message="project.commonsBuildDir: ${project.commonsBuildDir}"/>
+
+  <!-- ====================================================================== -->
+  <!-- Ivy settings file path                                          -->
+  <!-- ====================================================================== -->
+  <ivy:settings file="${project.commonsBuildDir}/ivysettings.xml"/>	
+	
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="${project.commonsBuildDir}/common-ant-build.properties"/>
+  <property file="${project.commonsBuildDir}/common-ant-jar-build.properties"/>
+  <!-- Project specific property -->	
+  <property file="ant-build.properties"/>
+  <property file="ant-package.properties"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath"/>
+    <!-- paths used for compilation and run  -->
+	<path id="lib.path.id">
+	    <fileset dir="${ivy.lib.dir}" includes="**/*.jar" />
+  </path>
+	
+  <path id="test.classpath">
+    <!-- paths used for test  -->
+    <path refid="lib.path.id"/>
+    <pathelement location="${project.build.outputDir}"/>
+    <pathelement location="${project.build.testOutputDir}"/>
+  </path>
+	
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${project.build.dir}"/>
+  </target>
+
+  <target name="init" description="Init the ant build process">
+  	
+  	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+  	
+  </target>
+
+	
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" depends="resolve-with-ivy" description="Compile the code">
+    <mkdir dir="${project.build.outputDir}"/>
+    <javac destdir="${project.build.outputDir}" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="1.6" 
+           verbose="false" 
+           fork="false" 
+           source="1.6">
+      <src>
+        <pathelement location="${project.build.srcDir}"/>
+      </src>
+      <classpath>
+      	<path refid="build.classpath"/>
+      	<path refid="lib.path.id"/>
+      </classpath>	
+    </javac>
+  	<copy todir="${project.build.outputDir}">
+  	    <fileset dir="${project.build.resourceDir}" excludes="*/*.java"/>
+  	</copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Test-compilation target                                                -->
+  <!-- ====================================================================== -->
+
+  <target name="compile-tests" 
+          depends="compile" 
+          description="Compile the test code" 
+          unless="project.test.skip">
+    <mkdir dir="${project.build.testOutputDir}"/>
+    <javac destdir="${project.build.testOutputDir}" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="1.6" 
+           verbose="false" 
+           fork="false" 
+           source="1.6">
+      <src>
+        <pathelement location="${project.build.testDir}"/>
+      </src>
+      <classpath>
+        <path refid="lib.path.id"/>
+        <pathelement location="${project.build.outputDir}"/>
+      </classpath>
+    </javac>
+  	<copy todir="${project.build.testOutputDir}">
+  	    <fileset dir="${project.build.testResourceDir}" excludes="*/*.java"/>
+  	</copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Run all tests                                                          -->
+  <!-- ====================================================================== -->
+
+  <target name="test" 
+          depends="compile-tests, coverage-instrument" 
+          unless="junit.skipped" 
+          description="Run the test cases">
+    <mkdir dir="${project.test.reports}"/>
+    <junit printSummary="yes" haltonerror="true" haltonfailure="true" fork="true" dir=".">
+      <sysproperty key="basedir" value="."/>
+    	
+	  <sysproperty key="net.sourceforge.cobertura.datafile" file="${project.coverage.cobertura.ser.file}" />    	
+    	
+	  <classpath location="${project.coverage.instrumented.dir}"/>
+  	  <classpath location="${project.build.outputDir}"/>
+      <classpath location="${project.build.testOutputDir}"/>
+      <classpath refid="lib.path.id" />
+    	
+		<formatter type="xml"/>
+		<formatter type="plain" usefile="false"/>
+      	
+      <batchtest todir="${project.test.reports}" unless="test">
+        <fileset dir="${project.build.testDir}">
+          <include name="**/Test*.java"/>
+          <include name="**/*Test.java"/>
+          <include name="**/*TestCase.java"/>
+          <exclude name="**/*Abstract*Test.java"/>
+        </fileset>
+      </batchtest>
+      <batchtest todir="${project.test.reports}" if="test">
+        <fileset dir="${project.build.testDir}">
+          <include name="**/${test}.java"/>
+          <exclude name="**/*Abstract*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="test-junit-present">
+    <available classname="junit.framework.Test" property="junit.present"/>
+  </target>
+
+  <target name="test-junit-status" 
+          depends="test-junit-present">
+    <condition property="junit.missing">
+      <and>
+        <isfalse value="${junit.present}"/>
+        <isfalse value="${project.test.skip}"/>
+      </and>
+    </condition>
+    <condition property="junit.skipped">
+      <or>
+        <isfalse value="${junit.present}"/>
+        <istrue value="${project.test.skip}"/>
+      </or>
+    </condition>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" unless="project.skipAllReports" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${project.build.srcDir}" 
+             packagenames="*"
+    		 classpathref="test.classpath" 
+             destdir="${project.reporting.outputDirectory}/apidocs" 
+             access="protected" 
+             old="false" 
+             verbose="false" 
+             version="true" 
+             use="true" 
+             author="true" 
+             splitindex="false" 
+             nodeprecated="false" 
+             nodeprecatedlist="false" 
+             notree="false" 
+             noindex="false" 
+             nohelp="false" 
+             nonavbar="false" 
+             serialwarn="false" 
+             charset="ISO-8859-1" 
+             linksource="false" 
+             breakiterator="false"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="clean,init,compile,test,javadoc,coverage-report,report-with-ivy" description="Package the application">
+  	
+	<!-- For windows, bundle the jre inside the package -->
+	<if>
+	 <equals arg1="${os.type}" arg2="windows32" />
+	 <then>
+	  	<unzip dest="${package.dir}">  	
+	 	 <fileset dir="${ivy.jre-zip.dir}">
+ 	        <include name="**/*.zip"/>
+	 	 </fileset>
+	  	</unzip>	
+	 </then>
+	</if>
+
+	<!-- Copy the .jars into the lib directory -->
+  	<copy todir="${package.lib.dir}">
+  	    <fileset dir="${ivy.default.dir}" includes="**/*.jar"/>
+  	</copy>
+  	
+	<!-- Copy all the binaries and Unzip them in the package bin directory. Then delete the .zip -->
+  	<copy todir="${package.bin.dir}">
+  	    <fileset dir="${ivy.bin.dir}" includes="**/*"/>
+  	</copy>
+  	<unzip dest="${package.bin.dir}">  	
+ 	 <fileset dir="${package.bin.dir}">
+	        <include name="**/*.zip"/>
+ 	 </fileset>
+  	</unzip>	
+  	<delete >
+  		<fileset dir="${package.bin.dir}" includes="**/*.zip"/>
+  	</delete>
+  	
+	<antcall target="zip-it-all"/>
+  	
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Jar it up  -->
+  <!-- ====================================================================== -->
+
+  <target name="zip-it-all" description="Builds the zip for the application">
+    <tstamp>
+        <format property="buildTime" pattern="MM/dd/yyyy hh:mm aa" timezone="America/New_York"/>
+    </tstamp>        
+
+    <zip destfile="${project.build.jarDir}/${project.build.finalName}.zip">
+    	 <fileset dir="${package.dir}"/>
+    </zip>	
+  </target>	
+
+	<target name="coverage-instrument" unless="project.skipAllReports" description="Instrument for code coverage">
+		<property name="testProp" refid="test.classpath" />
+		<echo message="coverage-instrument == ${testProp}"/>
+		
+		<delete file="${project.coverage.cobertura.ser.file}" />
+		
+	  	<taskdef classpathref="test.classpath" resource="tasks.properties"/>
+
+		<cobertura-instrument todir="${project.coverage.instrumented.dir}" datafile="${project.coverage.cobertura.ser.file}">
+			<fileset dir="${project.build.outputDir}">
+		        <include name="**/*.class" />
+			</fileset>
+		</cobertura-instrument>
+	</target>
+	
+    <target name="coverage-report" unless="project.skipAllReports" description="--> Cobertura code coverage">
+    	<cobertura-report datafile="${project.coverage.cobertura.ser.file}" format="html" destdir="${project.coverage.reports}" srcdir="${project.build.srcDir}" />
+    </target>
+	
+<!-- ivy integration -->    
+
+    	
+    <!-- ================================= 
+          target: resolve              
+         ================================= -->
+	<target name="resolve-with-ivy" depends="clean-org-cache" description="--> retreive dependencies with ivy">
+		<!-- Commented for now, Eventually when using shared repo / CI server we might need this call:
+			<ivy:cleancache />
+		 -->
+		
+		<if>
+		 <equals arg1="${os.type}" arg2="windows32" />
+		 <then>
+		   <echo message="retreive dependencies with ivy for Windows" />
+		   <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" sync="true" file="ivy-windows.xml" />
+		 </then>
+		<elseif>
+		 <equals arg1="${os.type}" arg2="mac32" />
+		 <then>
+		   <echo message="retreive dependencies with ivy for Mac" />
+		   <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" sync="true" file="ivy-mac.xml" />
+		 </then>
+		</elseif>
+		</if>
+		
+		
+	</target>    
+    
+	<target name="clean-org-cache" description="--> Cleans the .cache folder of all pixelsimple releases.">
+		<echo message="cache dir to purge == ${ivy.cache.dir}/${project.orgName}"/>
+	    <delete dir="${ivy.cache.dir}/${project.orgName}"/>
+	</target>    
+    
+    <!-- ================================= 
+          target: report              
+         ================================= -->
+    <target name="report-with-ivy" unless="project.skipAllReports" description="--> generates a report of dependencies">
+        <ivy:report todir="${project.ivy.reports}"/>
+    </target>
+
+
+    <!-- ================================= 
+      target: publish (Same as install in maven). Put it to ivy repos.              
+     ================================= -->
+    <target name="publish-with-ivy" depends="package" description="-->started goal, packages, reports, delivers and publishes">
+    	
+    	<antcall target="artifactory-publish" />
+    	<antcall target="local-publish" />
+    	
+    </target>
+
+    <target name="artifactory-publish" if="project.publishToArtifactory" description="--Publishing to artifactory if it ${project.publishToArtifactory} is set. ">
+    	<ivy:publish resolver="artifactory-publish" pubrevision="${project.build.version}" overwrite="true" />
+	</target>
+	
+    <target name="local-publish" unless="project.publishToArtifactory" description="--Publishing to local repo of the developer running this. This will be ${user.home}/.ivy/local">
+    	<ivy:publish resolver="local" pubrevision="${project.build.version}" overwrite="true" />
+	</target>
+	
+<!-- ivy integration -->    
+
+	
+</project>
