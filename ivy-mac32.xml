@@ -27,11 +27,12 @@
 		<dependency org="org.ffmpeg" name="32-bit-ffprobe" rev="0.7_beta2" force="true" conf="bin->runtime(*),master(*)"/>
 
 		<dependency org="pixelsimple" name="commons-util" rev="latest.integration" force="true" conf="default"/>
+		<dependency org="pixelsimple" name="app-core" rev="latest.integration" force="true" conf="default"/>
 		<dependency org="pixelsimple" name="commons-command-runner" rev="latest.integration" force="true" conf="default"/>
 		<dependency org="pixelsimple" name="commons-media-info" rev="latest.integration" force="true" conf="default"/>
 		<dependency org="pixelsimple" name="transcoder" rev="latest.integration" force="true" conf="default"/>
 
 		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1" conf="coverage->runtime(*),master(*)"/>
-		<dependency org="junit" name="junit" rev="3.8.1" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="junit" name="junit" rev="4.10" force="true" conf="test->runtime(*),master(*)"/>
 	</dependencies>
 </ivy-module>

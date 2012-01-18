@@ -243,6 +243,23 @@
   		<fileset dir="${package.bin.dir}" includes="**/*.zip"/>
   	</delete>
   	<chmod dir="${package.bin.dir}" perm="777" includes="**/*"/>
+
+	<!-- Copy the bat/sh files and property files into the bin and etc directory -->
+	<if>
+	 <equals arg1="${os.type}" arg2="windows32" />
+	 <then>
+ 	    <echo message="Copying the script files to the bin and etc directory" />
+	  	<copy file="${package.invoke.bat.win.file}" todir="${package.bin.dir}" />
+	  	<copy file="${package.app.config.win.file}" todir="${package.etc.dir}" />
+	 </then>
+	<elseif>
+	 <equals arg1="${os.type}" arg2="mac32" />
+	 <then>
+	   <echo message="Need to copy the script files" />
+	 </then>
+	</elseif>
+		
+	</if>
   	
 	<antcall target="zip-it-all"/>
   	
