@@ -1,7 +1,7 @@
 @echo off
 title PixelSimple App Test
 echo.
-echo Starting Webme...
+echo Starting Nova...
 echo.
 echo To stop, press Ctrl+c
 setlocal
@@ -28,7 +28,7 @@ goto :end
 set _JAVACMD="%PIXELSIMPLE_HOME%\jre\bin\java.exe"
 
 REM %_JAVACMD% -server -Xmx512m -XX:MaxPermSize=128m -Djetty.home="%ARTIFACTORY_HOME%" -Dartifactory.home="%ARTIFACTORY_HOME%" -Dfile.encoding=UTF8 -cp "%CLASSPATH%" org.artifactory.standalone.main.Main %*
-%_JAVACMD% -Dwebme.home=%PIXELSIMPLE_HOME% -Dwebme.appConfigFile=%APP_CONFIG_FILE% -cp "%CLASSPATH%" com.pixelsimple.appcore.init.Bootstrap %*
+%_JAVACMD% -Dnova.home=%PIXELSIMPLE_HOME% -Dnova.appConfigFile=%APP_CONFIG_FILE% -cp "%CLASSPATH%" com.pixelsimple.appcore.init.Bootstrap %*
 
 @endlocal
 :end
