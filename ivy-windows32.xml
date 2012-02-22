@@ -12,7 +12,8 @@
 		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
 		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
 		<conf name="bin" visibility="private" description="The external libraries and binaries (non-java) that are used by the application" extends="runtime"/>
-		<conf name="jre-zip" visibility="private" description="The external libraries and binaries (non-java) that are used by the application" extends="runtime"/>
+		<conf name="jre-zip" visibility="private" description="The Jre that should be used" extends="runtime"/>
+		<conf name="webapps" visibility="private" description="The configuration for the war files" extends="runtime"/>
 		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
 		<conf name="coverage" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and code coverage phases." extends="runtime"/>
 		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
@@ -28,11 +29,8 @@
 		<dependency org="org.ffmpeg" name="32-bit-ffmpeg" rev="0.8" force="true" conf="bin->runtime(*),master(*)"/>
 		<dependency org="org.ffmpeg" name="32-bit-ffprobe" rev="0.8" force="true" conf="bin->runtime(*),master(*)"/>
 
-		<dependency org="pixelsimple" name="commons-util" rev="latest.integration" force="true" conf="default"/>
-		<dependency org="pixelsimple" name="app-core" rev="latest.integration" force="true" conf="default"/>
-		<dependency org="pixelsimple" name="commons-command-runner" rev="latest.integration" force="true" conf="default"/>
-		<dependency org="pixelsimple" name="commons-media-info" rev="latest.integration" force="true" conf="default"/>
-		<dependency org="pixelsimple" name="transcoder" rev="latest.integration" force="true" conf="default"/>
+		<dependency org="pixelsimple" name="framezap-bootstrap" rev="latest.integration" force="true" conf="default"/>
+		<dependency org="pixelsimple" name="framezap-web" rev="latest.integration" force="true" conf="webapps->runtime(*),master(*)"/>
 
 		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1" conf="coverage->runtime(*),master(*)"/>
 		<dependency org="junit" name="junit" rev="4.10" force="true" conf="test->runtime(*),master(*)"/>

@@ -4,7 +4,7 @@
 <!-- Ant build file (http://ant.apache.org/) for Ant 1.6.2 or above.        -->
 <!-- ====================================================================== -->
 
-<project name="abstract-ant-jar-build" default="publish-with-ivy" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="package-build" default="publish-with-ivy" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <echo message="project.commonsBuildDir: ${project.commonsBuildDir}"/>
 
@@ -18,7 +18,6 @@
   <!-- ====================================================================== -->
 
   <property file="${project.commonsBuildDir}/common-ant-build.properties"/>
-  <property file="${project.commonsBuildDir}/common-ant-jar-build.properties"/>
   <!-- Project specific property -->	
   <property file="ant-build.properties"/>
   <property file="ant-package.properties"/>
@@ -226,9 +225,24 @@
 	</if>
 
 	<!-- Copy the .jars into the lib directory -->
-  	<copy todir="${package.lib.dir}">
-  	    <fileset dir="${ivy.default.dir}" includes="**/*.jar"/>
-  	</copy>
+    <if>
+	  <available file="${ivy.default.dir}" type="dir" />
+	  	<then>      
+		  	<copy todir="${package.lib.dir}">
+		  	    <fileset dir="${ivy.default.dir}" includes="**/*.jar"/>
+		  	</copy>
+	  	</then>
+	 </if>		
+  	
+	<!-- Copy the .wars into the lib directory -->
+    <if>
+	  <available file="${ivy.webapps.dir}" type="dir" />
+	  	<then>      
+		  	<copy todir="${package.webapps.dir}">
+		  	    <fileset dir="${ivy.webapps.dir}" includes="**/*.war"/>
+		  	</copy>
+	  	</then>
+	 </if>		
   	
 	<!-- Copy all the binaries and Unzip them in the package bin directory. Then delete the .zip -->
   	<copy todir="${package.bin.dir}">
@@ -244,13 +258,14 @@
   	</delete>
   	<chmod dir="${package.bin.dir}" perm="777" includes="**/*"/>
 
-	<!-- Copy the bat/sh files and property files into the bin and etc directory -->
+	<!-- Copy the bat/sh files and property files into the bin, config and etc directory -->
 	<if>
 	 <equals arg1="${os.type}" arg2="windows32" />
 	 <then>
  	    <echo message="Copying the script files to the bin and etc directory" />
-	  	<copy file="${package.invoke.bat.win.file}" todir="${package.bin.dir}" />
-	  	<copy file="${package.app.config.win.file}" todir="${package.etc.dir}" />
+	  	<copy file="${package.invoke.framezap.bat.win.file}" todir="${package.dir}" />
+	  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
+	  	<copy file="${package.app.config.win.file}" todir="${package.config.dir}" />
 	 </then>
 	<elseif>
 	 <equals arg1="${os.type}" arg2="mac32" />
@@ -266,7 +281,7 @@
   </target>
 
   <!-- ====================================================================== -->
-  <!-- Jar it up  -->
+  <!-- Zip it up  -->
   <!-- ====================================================================== -->
 
   <target name="zip-it-all" description="Builds the zip for the application">
