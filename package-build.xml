@@ -263,7 +263,7 @@
 	 <equals arg1="${os.type}" arg2="windows32" />
 	 <then>
  	    <echo message="Copying the script files to the bin and etc directory" />
-	  	<copy file="${package.invoke.framezap.bat.win.file}" todir="${package.dir}" />
+	  	<copy file="${package.invoke.framezap.win.file}" todir="${package.dir}" />
 	  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
 	  	<copy file="${package.app.config.win.file}" todir="${package.config.dir}" />
 	 </then>
@@ -271,6 +271,9 @@
 	 <equals arg1="${os.type}" arg2="mac32" />
 	 <then>
 	   <echo message="Need to copy the script files" />
+	  	<copy file="${package.invoke.framezap.mac.file}" todir="${package.dir}" />
+	  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
+	  	<copy file="${package.app.config.mac.file}" todir="${package.config.dir}" />
 	 </then>
 	</elseif>
 		
