@@ -12,7 +12,7 @@ fi
 
 PIXELSIMPLE_HOME=`dirname "$0"`
 LIB_DIR=$PIXELSIMPLE_HOME/lib
-APP_CONFIG_FILE=$PIXELSIMPLE_HOME/config/app_config_win.properties
+APP_CONFIG_FILE=$PIXELSIMPLE_HOME/config/app_config_mac.properties
 JETTY_CONFIG_FILE=$PIXELSIMPLE_HOME/config/jetty_config.xml
 CLASSPATH=$PIXELSIMPLE_HOME/*.jar
 SERVER_PORT=9999
