@@ -1,51 +1,81 @@
 @echo off
-set test_file=Z:\Downloads\Nova\test_file.txt
-title PixelSimple App Test
-echo.
-echo Starting FrameZap... >> %test_file%
-echo.
-echo To stop, press Ctrl+c >> %test_file%
 setlocal
 
-REM FindStr.exe - grep
-REM tasklist.exe - ps
-REM cat - copy /b 
-REM command >> file	Append standard output of command to file
-REM command 1>> file	Append standard output of command to file (same as previous)
-REM command 2>> file	Append standard error of command to file (OS/2 and NT)
+REM Example usage: hls_playlist_generator.bat Z:\Downloads\Nova\ Z:\Downloads\Nova\hls_playlist.m3u8 ts 10 Z:\Downloads\Nova\hls_t.complete 10 /someurl
 
-REM ref links:
-REM http://stackoverflow.com/questions/5657035/how-can-i-write-the-pipe-command-linux-in-windows-batch
-REM http://stackoverflow.com/questions/1613644/how-to-replace-names-recursively-via-windows-batch-operation
-REM http://commandwindows.com/command1.htm
+REM - mandatory - the hls_media_dir should have the trailing \ at the end. Simplifies the script.
+set hls_media_dir=%1
+set playlist_file=%2
+set hls_file_extension_pattern=%3
+set check_interval_in_sec=%4
+set hls_transcode_complete_file=%5
+set segment_time=%6
+set base_uri=%7
 
-REM for /f "tokens=*" %%i IN (Z:\Downloads\Nova\ffmpeg_out.txt) DO @echo %%i >> %test_file%
-REM if ERRORLEVEL 1 goto err_handler
-REM goto all_fine
-REM :err_handler
-REM echo Unable to open the file >> %test_file%
-REM :all_fine
-REM echo All fine and dandy now >> %test_file% 
+REM Other variables
+set temp_playlist_file=%hls_media_dir%hls_temp.m3u8
+set log_file=%hls_media_dir%hls_log.txt
+set hls_file_start=#EXTM3U
+set hls_file_duration=#EXT-X-TARGETDURATION:%segment_time%
+set hls_file_sequence=#EXT-X-MEDIA-SEQUENCE:0
+REM TODO: what is that 10 below? read the damn manual!
+set hls_segment_header=#EXTINF:10, no desc
+set hls_file_end=#EXT-X-ENDLIST
+set completed=false
 
-rem if exist "Z:\Downloads\Nova\ffmpeg_out.txt" (
-rem     echo Wow! able to open the file >> %test_file%
-rem ) else (
-rem     echo Unable to open the file >> %test_file%
-rem )
+REM purge stuff to start with
 
-REM wait 5s to ensure that the out.txt file is created.
-REM TIMEOUT /T 5 /NOBREAK
-@ping 127.0.0.1 -n 5 -w 1000 > nul
+if exist %playlist_file% del %playlist_file% > nul
+if exist %log_file% del %log_file% > nul
 
-REM set /p line=< Z:\Downloads\Nova\ffmpeg_out.txt
-for /f "tokens=*" %%i IN (Z:\Downloads\Nova\ffmpeg_out.txt) DO @echo %%i >> %test_file%
+REM TODO: error handling - if access issues then abort this script.
+REM init stuff
+echo.>%playlist_file%
+echo.>%log_file%
 
-REM # some error if errorlevel >= 1
-if ERRORLEVEL 1 (
-	echo great snakes! some error >> %test_file%
-	echo %line%
-) else (
-	echo holy crap! all good  >> %test_file%
-	echo %line%
-)
+echo %hls_media_dir% >> %log_file%
+echo %playlist_file% >> %log_file%
+echo %hls_file_extension_pattern% >> %log_file%
+echo %check_interval_in_sec% >> %log_file%
+echo %hls_transcode_complete_file% >> %log_file%
+echo %segment_time% >> %log_file%
+echo %base_uri% >> %log_file%
+
+goto until_hls_transcode_complete
+
+:until_hls_transcode_complete
+
+	if exist %hls_transcode_complete_file% (
+		set completed=true
+		goto create_playlist
+	) else (
+		REM wait for the specified time
+		@ping 127.0.0.1 -n %check_interval_in_sec% -w 1000 > nul
+		goto create_playlist
+	)
+
+:create_playlist
+	if exist %temp_playlist_file% del %temp_playlist_file% > nul 
+	REM create the file hearder parts
+	echo %hls_file_start% >> %temp_playlist_file%
+	echo %hls_file_duration% >> %temp_playlist_file%
+	echo %hls_file_sequence% >> %temp_playlist_file%
+		
+	for /f "usebackq tokens=*" %%f in (`dir /b %hls_media_dir% ^| findstr %hls_file_extension_pattern% 2^>nul:`) do (
+		echo completed=%completed% >> %log_file%	
+		
+		echo %hls_segment_header% >> %temp_playlist_file%
+		echo %base_uri%%hls_media_dir%%%~f >> %temp_playlist_file%
+	)	
+	echo %hls_file_end% >> %temp_playlist_file%
+	copy /b %temp_playlist_file% %playlist_file% > nul
+	
+	if %completed%==false (
+		goto until_hls_transcode_complete
+	) else (
+		goto end
+	)
+	
+	
+:end
 
