@@ -6,7 +6,7 @@ REM Example usage: hls_playlist_generator.bat Z:\Downloads\Nova\ Z:\Downloads\No
 REM - mandatory - the hls_media_dir should have the trailing \ at the end. Simplifies the script.
 set hls_media_dir=%1
 set playlist_file=%2
-set hls_file_extension_pattern=%3
+set hls_file_extension=%3
 set check_interval_in_sec=%4
 set hls_transcode_complete_file=%5
 set segment_time=%6
@@ -35,7 +35,7 @@ echo.>%log_file%
 
 echo %hls_media_dir% >> %log_file%
 echo %playlist_file% >> %log_file%
-echo %hls_file_extension_pattern% >> %log_file%
+echo %hls_file_extension% >> %log_file%
 echo %check_interval_in_sec% >> %log_file%
 echo %hls_transcode_complete_file% >> %log_file%
 echo %segment_time% >> %log_file%
@@ -61,11 +61,12 @@ goto until_hls_transcode_complete
 	echo %hls_file_duration% >> %temp_playlist_file%
 	echo %hls_file_sequence% >> %temp_playlist_file%
 		
-	for /f "usebackq tokens=*" %%f in (`dir /b %hls_media_dir% ^| findstr %hls_file_extension_pattern% 2^>nul:`) do (
+	for /f "usebackq tokens=*" %%f in (`dir /b %hls_media_dir% ^| findstr %hls_file_extension% 2^>nul:`) do (
 		echo completed=%completed% >> %log_file%	
 		
 		echo %hls_segment_header% >> %temp_playlist_file%
-		echo %base_uri%%hls_media_dir%%%~f >> %temp_playlist_file%
+		REM removing the quotes from media dir if present
+		echo %base_uri%%hls_media_dir:"=%%%~f >> %temp_playlist_file%
 	)	
 	echo %hls_file_end% >> %temp_playlist_file%
 	copy /b %temp_playlist_file% %playlist_file% > nul
@@ -78,4 +79,4 @@ goto until_hls_transcode_complete
 	
 	
 :end
-
+if exist %temp_playlist_file% del %temp_playlist_file% > nul 
