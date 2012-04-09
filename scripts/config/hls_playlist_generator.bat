@@ -23,16 +23,16 @@ set hls_segment_header=#EXTINF:10, no desc
 set hls_file_end=#EXT-X-ENDLIST
 set completed=false
 
+REM TODO: error handling - if access issues then abort this script.
 REM purge stuff to start with
-
 if exist %playlist_file% del %playlist_file% > nul
 if exist %log_file% del %log_file% > nul
 
-REM TODO: error handling - if access issues then abort this script.
 REM init stuff
 echo.>%playlist_file%
 echo.>%log_file%
 
+echo Starting the transcoding at %date% %time% >> %log_file%
 echo %hls_media_dir% >> %log_file%
 echo %playlist_file% >> %log_file%
 echo %hls_file_extension% >> %log_file%
@@ -49,8 +49,10 @@ goto until_hls_transcode_complete
 		set completed=true
 		goto create_playlist
 	) else (
-		REM wait for the specified time
-		@ping 127.0.0.1 -n %check_interval_in_sec% -w 1000 > nul
+		REM wait for the specified time. Very inefficient, but works on older windows where timeout is not present.
+		REM @ping 127.0.0.1 -n %check_interval_in_sec% -w 1000 > nul
+		REM use timeout only on modern windows - Win7 (xp should use the ping logic above)
+		timeout /T %check_interval_in_sec% /NOBREAK > nul
 		goto create_playlist
 	)
 
@@ -62,8 +64,6 @@ goto until_hls_transcode_complete
 	echo %hls_file_sequence% >> %temp_playlist_file%
 		
 	for /f "usebackq tokens=*" %%f in (`dir /b %hls_media_dir% ^| findstr %hls_file_extension% 2^>nul:`) do (
-		echo completed=%completed% >> %log_file%	
-		
 		echo %hls_segment_header% >> %temp_playlist_file%
 		REM removing the quotes from media dir if present
 		echo %base_uri%%hls_media_dir:"=%%%~f >> %temp_playlist_file%
@@ -72,8 +72,10 @@ goto until_hls_transcode_complete
 	copy /b %temp_playlist_file% %playlist_file% > nul
 	
 	if %completed%==false (
+		echo completed=%completed% at %date% %time%  >> %log_file%	
 		goto until_hls_transcode_complete
 	) else (
+		echo completed=%completed% Going to end! at %date% %time%  >> %log_file%	
 		goto end
 	)
 	
