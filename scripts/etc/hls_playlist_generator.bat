@@ -49,10 +49,8 @@ goto until_hls_transcode_complete
 		set completed=true
 		goto create_playlist
 	) else (
-		REM wait for the specified time. Very inefficient, but works on older windows where timeout is not present.
-		REM @ping 127.0.0.1 -n %check_interval_in_sec% -w 1000 > nul
-		REM use timeout only on modern windows - Win7 (xp should use the ping logic above)
-		timeout /T %check_interval_in_sec% /NOBREAK > nul
+		REM wait for the specified time. 
+		@ping -n %check_interval_in_sec% 127.0.0.1 > nul
 		goto create_playlist
 	)
 

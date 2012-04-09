@@ -256,7 +256,6 @@
   	<delete >
   		<fileset dir="${package.bin.dir}" includes="**/*.zip"/>
   	</delete>
-  	<chmod dir="${package.bin.dir}" perm="777" includes="**/*"/>
 
 	<!-- Copy the bat/sh files and property files into the bin, config and etc directory -->
 	<if>
@@ -266,6 +265,7 @@
 	  	<copy file="${package.invoke.framezap.win.file}" todir="${package.dir}" />
 	  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
 	  	<copy file="${package.app.config.win.file}" todir="${package.config.dir}" />
+	  	<copy file="${package.hls.playlist.generator.win.file}" todir="${package.bin.dir}" />
 	 </then>
 	<elseif>
 	 <equals arg1="${os.type}" arg2="mac32" />
@@ -274,12 +274,15 @@
 	  	<copy file="${package.invoke.framezap.mac.file}" todir="${package.dir}" />
 	  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
 	  	<copy file="${package.app.config.mac.file}" todir="${package.config.dir}" />
+	  	<copy file="${package.hls.playlist.generator.mac.file}" todir="${package.bin.dir}" />
 	 </then>
 	</elseif>
-		
 	</if>
-  	
-	<antcall target="zip-it-all"/>
+	
+  	<!-- Give the right perms -->
+  	<chmod dir="${package.bin.dir}" perm="777" includes="**/*"/>
+
+  	<antcall target="zip-it-all"/>
   	
   </target>
 
