@@ -26,4 +26,4 @@ do
 done
 
 echo "Runing: exec $JAVACMD$JAVA_OPTIONS -cp \"$CLASSPATH\" com.pixelsimple.framezap.bootstrap.FrameZapBootstrap $@"
-exec "$JAVACMD" $JAVA_OPTIONS -cp "$CLASSPATH" com.pixelsimple.framezap.bootstrap.FrameZapBootstrap "$@"
+exec "$JAVACMD" $JAVA_OPTIONS -server -Xmx512m -XX:MaxPermSize=128m -cp "$CLASSPATH" com.pixelsimple.framezap.bootstrap.FrameZapBootstrap "$@"

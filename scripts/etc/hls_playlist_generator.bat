@@ -10,7 +10,8 @@ set hls_file_extension=%3
 set check_interval_in_sec=%4
 set hls_transcode_complete_file=%5
 set segment_time=%6
-set base_uri=%7
+REM Stripping the end double quotes - The base uri can contain '=' param. Hence it needs to be passed with quotes (if passed) 
+set base_uri=%~7
 
 REM Other variables
 set temp_playlist_file=%hls_media_dir%hls_temp.m3u8

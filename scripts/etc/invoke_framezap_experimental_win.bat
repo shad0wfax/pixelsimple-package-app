@@ -29,7 +29,7 @@ goto :end
 set _JAVACMD="%PIXELSIMPLE_HOME%\jre\bin\java.exe"
 
 REM %_JAVACMD% -server -Xmx512m -XX:MaxPermSize=128m -Djetty.home="%ARTIFACTORY_HOME%" -Dartifactory.home="%ARTIFACTORY_HOME%" -Dfile.encoding=UTF8 -cp "%CLASSPATH%" org.artifactory.standalone.main.Main %*
-%_JAVACMD% -Dapp.home=%PIXELSIMPLE_HOME% -DappConfigFile=%APP_CONFIG_FILE% -Djetty.home=%PIXELSIMPLE_HOME% -Djetty.configFile=%JETTY_CONFIG_FILE% -Dserver.port=%SERVER_PORT% -cp %CLASSPATH% com.pixelsimple.framezap.bootstrap.FrameZapBootstrap %*
+%_JAVACMD% -server -Xmx512m -XX:MaxPermSize=128m -Dapp.home=%PIXELSIMPLE_HOME% -DappConfigFile=%APP_CONFIG_FILE% -Djetty.home=%PIXELSIMPLE_HOME% -Djetty.configFile=%JETTY_CONFIG_FILE% -Dserver.port=%SERVER_PORT% -cp %CLASSPATH% com.pixelsimple.framezap.bootstrap.FrameZapBootstrap %*
 
 @endlocal
 :end
