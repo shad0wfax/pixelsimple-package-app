@@ -83,9 +83,8 @@ do
                 fi
 
                 echo "Duration of $file is" $durationString "but will use " $durationInt " and " $durationDecimal >> "$log_file"
-                # eval $"$ffprobe_path" -i "$hls_media_dir""$file" >> "$temp_playlist_file"
-        		echo "$hls_segment_header"$durationInt, >> "$temp_playlist_file"
-
+                echo "$hls_segment_header"$durationInt, >> "$temp_playlist_file"
+                
             else
                 # If transcoding is still in progress the segment time will be kept as the default segment_time
                 # Leaving segment description empty.

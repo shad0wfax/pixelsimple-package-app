@@ -88,7 +88,26 @@ goto until_hls_transcode_complete
 			for /f "usebackq tokens=2 delims=:" %%g in ('!ffprobeOutput!') do (
 				REM convert it to an integer (basically drop off the decimal places, as per the spec)
 				REM TODO: Ideally it should rounded off to the nearest integer, but it is not done for now. Redirecting any conversion error to nul.
-				set /a dur=%%g 2>nul
+				
+				set durString=%%g
+				REM Strip the quote
+				set durString=!durString:"=!
+				
+				REM Compute the duration by rounding off to a number. Split the string on decimal and compare the first digigt after decimal to round off.
+				for /f "usebackq tokens=1,2 delims=." %%a in ('!durString!') do (
+					set num=%%a
+					set decimal=%%b
+					REM Get the first digit after decimal
+					set decimal=!decimal:~0,1!
+
+					if !decimal! GEQ 5 set /a num=!num! + 1
+
+					set dur=!num!
+					
+					REM reset the variables end of the loop to ensure next iteration doesn't use previous one (can happen for data like: 0.17 or 10.023)
+					set num=0
+					set decimal=0
+				)
 				
 				REM we just need 2 places after decimal (if present)
 				echo Duration of %%~f is %%g will use !dur!  >> %log_file%
