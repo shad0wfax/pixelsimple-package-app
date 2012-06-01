@@ -263,7 +263,6 @@
 	 <then>
  	    <echo message="Copying the script files to the bin and etc directory" />
 	  	<copy file="${package.invoke.framezap.win.file}" todir="${package.dir}" />
-	  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
 	  	<copy file="${package.app.config.win.file}" todir="${package.config.dir}" />
 	  	<copy file="${package.hls.playlist.generator.win.file}" todir="${package.bin.dir}" />
 	 </then>
@@ -272,12 +271,14 @@
 	 <then>
 	   <echo message="Need to copy the script files" />
 	  	<copy file="${package.invoke.framezap.mac.file}" todir="${package.dir}" />
-	  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
 	  	<copy file="${package.app.config.mac.file}" todir="${package.config.dir}" />
 	  	<copy file="${package.hls.playlist.generator.mac.file}" todir="${package.bin.dir}" />
 	 </then>
 	</elseif>
 	</if>
+  	<!-- Copy common files that is OS independent -->
+  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
+  	<copy file="${package.framezap.log.config.file}" todir="${package.config.dir}" />
 	
   	<!-- Give the right perms -->
   	<chmod dir="${package.bin.dir}" perm="777" includes="**/*"/>
