@@ -275,14 +275,16 @@
 	  	<copy file="${package.hls.playlist.generator.mac.file}" todir="${package.bin.dir}" />
 	 	
 	  	<!-- Give the right perms Mac/Linux only-->
+ 	    <echo message="Mac:chmod operation to give execute permissions to ${package.bin.dir} folder and sh files" />
 	  	<chmod perm="a+rx">
 	  		<fileset dir="${package.bin.dir}" />
 	  	</chmod>
-	 	<chmod file="${package.dir}/${package.invoke.framezap.mac.file}" perm="a+rx"/>
+	 	<chmod dir="${package.dir}" perm="a+rx" includes="**/*.sh" />
 	 </then>
 	</elseif>
 	</if>
   	<!-- Copy common files that is OS independent -->
+ 	  <echo message="Copying log config and jetty config file" />
   	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
   	<copy file="${package.framezap.log.config.file}" todir="${package.config.dir}" />
 
@@ -299,9 +301,30 @@
         <format property="buildTime" pattern="MM/dd/yyyy hh:mm aa" timezone="America/New_York"/>
     </tstamp>        
 
-    <zip destfile="${project.build.jarDir}/${project.build.finalName}.zip">
-    	 <fileset dir="${package.dir}"/>
-    </zip>	
+    <!--
+    -->
+
+    <!-- The zip taks loses all file permissions, hence we need to update the bing and sh files again using update operations --> 
+    <if>
+    <equals arg1="${os.type}" arg2="mac32" />
+      <then>
+        <tar destfile="${project.build.jarDir}/${project.build.finalName}.tar">
+          <tarfileset dir="${package.dir}" filemode="755" />
+        </tar>
+        <gzip destfile="${project.build.jarDir}/${project.build.finalName}.tar.gz" src="${project.build.jarDir}/${project.build.finalName}.tar"/>
+      </then>
+    <elseif>
+      <equals arg1="${os.type}" arg2="windows32" />
+      <then>
+        <zip destfile="${project.build.jarDir}/${project.build.finalName}.zip">
+          <fileset dir="${package.dir}"/>
+        </zip>	
+      </then>
+    </elseif>
+    </if>
+    
+ 
+
   </target>	
 
 	<target name="coverage-instrument" unless="project.skipAllReports" description="Instrument for code coverage">
