@@ -27,7 +27,7 @@
 		<dependency org="org.ffmpeg" name="32-bit-ffmpeg" rev="1.0" force="true" conf="bin->runtime(*),master(*)"/>
 		<dependency org="org.ffmpeg" name="32-bit-ffprobe" rev="1.0" force="true" conf="bin->runtime(*),master(*)"/>
 
-		<dependency org="pixelsimple" name="framezap-bootstrap" rev="latest.integration" force="true" conf="default"/>
+		<dependency org="pixelsimple" name="app-bootstrap" rev="latest.integration" force="true" conf="default"/>
 		<dependency org="pixelsimple" name="framezap-web" rev="latest.integration" force="true" conf="webapps->runtime(*),master(*)"/>
 
 		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1" conf="coverage->runtime(*),master(*)"/>

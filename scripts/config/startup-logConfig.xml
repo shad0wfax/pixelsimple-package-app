@@ -2,19 +2,16 @@
 <configuration debug="false">
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     	<!-- Using / instead of \ as win7 supports it. Also logs folder is not prefixed with it, since app.home will be -->
-        <File>${app.home}logs/framezap.log</File>
+        <File>${app.home}logs/startup.log</File>
         <encoder>
             <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
-            <!-- <pattern>%date - [%level] - from %logger in %thread %n%message%n%xException%n</pattern> -->
         </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${app.home}logs/framezap.%i.log.zip</FileNamePattern>
-            <MinIndex>1</MinIndex>
-            <MaxIndex>9</MaxIndex>
-        </rollingPolicy>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>5MB</MaxFileSize>
-        </triggeringPolicy>
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	      <!-- daily rollover -->
+	      <fileNamePattern>startup.%d{yyyy-MM-dd}.log</fileNamePattern>
+	      <!-- keep 2 days' worth of history -->
+	      <maxHistory>2</maxHistory>
+	    </rollingPolicy>
     </appender>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -25,12 +22,14 @@
     <root level="OFF">
         <appender-ref ref="FILE"/>
     </root>
-    <logger name="com.pixelsimple" level="OFF">
-        <appender-ref ref="FILE"/>
-    </logger>
 
     <!-- non pixelsimple loggers -->
     <logger name="org.eclipse.jetty" level="OFF">
         <appender-ref ref="FILE"/>
     </logger>
+
+    <logger name="play" level="OFF">
+        <appender-ref ref="FILE"/>
+    </logger>
+    
 </configuration>
