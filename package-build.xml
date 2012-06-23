@@ -262,19 +262,27 @@
 	 <equals arg1="${os.type}" arg2="windows32" />
 	 <then>
  	    <echo message="Windows:Copying the script files to the bin and config directory" />
-	  	<copy file="${package.invoke.framezap.win.file}" todir="${package.dir}" />
-	  	<copy file="${package.app.config.win.file}" todir="${package.config.dir}" />
-	  	<copy file="${package.hls.playlist.generator.win.file}" todir="${package.bin.dir}" />
+	  	<copy file="${invoke.framezap.win.file}" todir="${package.dir}" />
+	  	<copy file="${app.config.win.file}" todir="${package.config.dir}" />
+	  	<copy file="${transcoder.hls.playlist.generator.win.file}" todir="${package.bin.dir}" />
+	 	<copy file="${mediascanner.media.scanner.win.file}" todir="${package.bin.dir}" />
+	 	<!-- Add module specific files -->
+	 	<copy file="${transcoder.config.win.file}" todir="${package.module.config.dir}" />
+	 	<copy file="${mediascanner.config.win.file}" todir="${package.module.config.dir}" />
 	 </then>
 	<elseif>
 	 <equals arg1="${os.type}" arg2="mac32" />
 	 <then>
  	    <echo message="Mac:Copying the script files to the bin and config directory" />
-	  	<copy file="${package.invoke.framezap.mac.file}" todir="${package.dir}" />
-	  	<copy file="${package.app.config.mac.file}" todir="${package.config.dir}" />
-	  	<copy file="${package.hls.playlist.generator.mac.file}" todir="${package.bin.dir}" />
-	 	
-	  	<!-- Give the right perms Mac/Linux only-->
+	  	<copy file="${invoke.framezap.mac.file}" todir="${package.dir}" />
+	  	<copy file="${app.config.mac.file}" todir="${package.config.dir}" />
+	  	<copy file="${transcoder.hls.playlist.generator.mac.file}" todir="${package.bin.dir}" />
+	 	<copy file="${mediascanner.media.scanner.mac.file}" todir="${package.bin.dir}" />
+	 	<!-- Add module specific files -->
+	 	<copy file="${transcoder.config.mac.file}" todir="${package.module.config.dir}" />
+	 	<copy file="${mediascanner.config.mac.file}" todir="${package.module.config.dir}" />
+
+	 	<!-- Give the right perms Mac/Linux only-->
  	    <echo message="Mac:chmod operation to give execute permissions to ${package.bin.dir} folder and sh files" />
 	  	<chmod perm="a+rx">
 	  		<fileset dir="${package.bin.dir}" />
@@ -285,9 +293,9 @@
 	</if>
   	<!-- Copy common files that is OS independent -->
  	  <echo message="Copying log config and jetty config file" />
-  	<copy file="${package.jetty.config.file}" todir="${package.config.dir}" />
-  	<copy file="${package.app.startup.log.config.file}" todir="${package.config.dir}" />
-  	<copy file="${package.framezap.log.config.file}" todir="${package.config.dir}" />
+  	<copy file="${jetty.config.file}" todir="${package.config.dir}" />
+  	<copy file="${app.startup.log.config.file}" todir="${package.config.dir}" />
+  	<copy file="${framezap.log.config.file}" todir="${package.config.dir}" />
 
   	<antcall target="zip-it-all"/>
   	
